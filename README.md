@@ -7,6 +7,6 @@ Scripts to go to:
  - https://osu.ppy.sh/beatmapsets?s=loved
  - https://osu.ppy.sh/beatmapsets?s=ranked
 
-And get the map info of maps in first page. Aroujnd 15 for osu!, around 20 for BeastSaber.
+And get the map info of maps in first page. Around 15 for osu!, around 20 for BeastSaber.
 
 Using Selenium, chromedriver.
