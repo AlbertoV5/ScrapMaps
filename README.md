@@ -7,7 +7,7 @@ Scripts to go to:
  - https://osu.ppy.sh/beatmapsets?s=loved
  - https://osu.ppy.sh/beatmapsets?s=ranked
 
-They get the map info of maps in first page, then go to youtube and look for the first result of the song title + artist name. Output goes to data folder as a tsv. 
+They get the info of maps in first page, then go to youtube and look for the first result of the song title + artist name. Output goes to data folder as a tsv. 
 
 ### What is done manually:
 - Organize tsv files by dates (when the scrapping was done).
