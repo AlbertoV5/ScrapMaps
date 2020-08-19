@@ -9,4 +9,6 @@ Scripts to go to:
 
 And get the map info of maps in first page. Around 15 for osu!, around 20 for BeastSaber.
 
+Also they go to youtube and look for the first result of the song title + artist name.
+
 Using Selenium, chromedriver.
