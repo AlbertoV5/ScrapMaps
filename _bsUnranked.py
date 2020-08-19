@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Get Maps from BeastSaber
+Get Maps from BeastSaber website.
+Using selenium with chromedriver on script path.
 
-Using selenium, make sure to have chromedriver updated.
+Unranked BS 7 days
 
 """
 from selenium import webdriver
@@ -11,7 +12,7 @@ from pathlib import Path
 import pandas as pd
 import time
 
-website = "https://bsaber.com/songs/top/?ranked=false&time=7-days"
+website = "https://bsaber.com/songs/top/?unranked=false&time=7-days"
 driver = webdriver.Chrome(Path.cwd() / "chromedriver")
 tsvFile = Path.cwd() / "data" / "beatsaberUnranked.tsv"
 
@@ -20,18 +21,18 @@ def MainPage():
     links = [i.get_attribute("href") for i in driver.find_elements_by_xpath("//a[@title]") if "songs" in i.get_attribute("href")]
     return list(dict.fromkeys(links))
         
-def Categories():
+def GetTags():
     div = driver.find_element_by_class_name("bsaber-categories")
-    links = [i.text for i in div.find_elements_by_tag_name("a")]
-    if len(links) == 0:
+    tags = [i.text for i in div.find_elements_by_tag_name("a")]
+    if len(tags) == 0:
         return "-"
     else:  
-        text = ""
-        for i in links:
-            text = text + str(i) + ", "
-        return text[:-2]
+        tagsString = ""
+        for i in tags:
+            tagsString = tagsString + str(i) + ", "
+        return tagsString[:-2]
 
-def Mapper():
+def GetMapper():
     for i in driver.find_elements_by_css_selector("a"):
         try:
             href = i.get_attribute("href")
@@ -39,8 +40,8 @@ def Mapper():
                 return href
         except:
             pass
-
-def GetScore():
+        
+def GetScore(): # returns [num of likes, num of dislikes]
     thumbs = driver.find_elements_by_class_name("post-stat")
     numbers = []
     for i in thumbs:
@@ -48,13 +49,11 @@ def GetScore():
             numbers.append(int(i.text))
         except:
             pass
-    return numbers
+    return numbers 
 
-    
 def GetYoutube(name):
     driver.get("https://www.youtube.com/results?search_query=" + name)    
-    firstResult = driver.find_element_by_id("video-title").get_attribute("href")
-    return firstResult
+    return driver.find_element_by_id("video-title").get_attribute("href")
     
 def GetDate():
     date = driver.find_element_by_tag_name("time").text
@@ -68,42 +67,28 @@ def GetDate():
         num = int(date.split(" ")[0]) / 24
     return num
 
-def Page(page):
-    driver.get(page)
+def Single(webpage):
+    driver.get(webpage)
     time.sleep(1)
     
     song = driver.find_element_by_class_name("entry-title").text
-    mapper = Mapper()
-    categories = Categories()
     scores = GetScore() 
-    days = GetDate()
-    stream = GetYoutube(song)
+    scoreRatio = "=(" + str(scores[0]) + "-" + str(scores[1]) + ")/" + str(GetDate()) # excel formula
+    tags = GetTags()
+    mapper = GetMapper()
     
-    Row(song, mapper, categories, scores, stream, days, page)
-    
-def Row(song, mapper, categories, scores, stream, days, page):
-    #ratio = str(int(scores[0]-scores[1]/days))
-    #ratio formula for excel/sheet
-    ratio = "=(" + str(scores[0]) + "-" + str(scores[1]) + ")/" + str(days) 
-    text = str(song) + "\t - \t" + str(stream) + "\t" + str(categories) + "\t" 
-    text = text + ratio + "\t" + str(page) + "\t" + str(mapper) + "\n"
-    
-    with open(tsvFile, "r") as file:
-        base = file.read()
-    with open(tsvFile, "w+") as file:
-        file.write(base + text)
-
-
-# Create/rewrites the file
-header = "Song \t Genre \t Youtube \t Tags \t Likes/Days \t Map \t Mapper \n"
-with open(tsvFile, "w+") as file:
-    file.write(header)
+    # Beast Saber doesnt include song genre info, has to be input manually, listening to the song
+    return pd.DataFrame({"Song": [song], "Genre": ["-"], "Youtube": [GetYoutube(song)], 
+                         "Tags": [tags], "Map": [webpage], "Mapper": [mapper], "Likes/Days":[scoreRatio]})
 
 # Save 
-for i in MainPage():
-    Page(i)
+sheet = pd.DataFrame({"Song" : [], "Genre": [], "Youtube": [], "Tags": [], "Map": [], "Mapper": [], "Likes/Days": []})
+
+for page in MainPage():
+    sheet = sheet.append(Single(page))
+    
+sheet.to_csv(tsvFile, sep = "\t", index = False)
     
 print("\nDone :)")
-
 
 

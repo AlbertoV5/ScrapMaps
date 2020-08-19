@@ -9,9 +9,9 @@ from pathlib import Path
 import pandas as pd
 import time
 
-website = "https://osu.ppy.sh/beatmapsets?s=loved"
+website = "https://osu.ppy.sh/beatmapsets?s=ranked"
 driver = webdriver.Chrome(Path.cwd() / "chromedriver")
-tsvFile = Path.cwd() / "data" / "osuLoved.tsv"
+tsvFile = Path.cwd() / "data" / "osuRanked.tsv"
 
 def MainPage():
     time.sleep(2)
@@ -27,9 +27,11 @@ def Single(webpage):
     artist = driver.find_elements_by_class_name("beatmapset-header__details-text")[1].text
     mapper = driver.find_element_by_class_name("beatmapset-mapping__user").get_attribute("href")
     genre = driver.find_element_by_class_name("beatmapset-info__half-entry").find_element_by_tag_name("a").text
+    tags = GetTags()
     song = songName + " " + artist
 
-    return pd.DataFrame({"Song": [song], "Genre": [genre], "Youtube": [GetYoutube(song)], "Tags": [GetTags(webpage)], "Map": [webpage], "Mapper": [mapper]})
+    return pd.DataFrame({"Song": [song], "Genre": [genre], "Youtube": [GetYoutube(song)], 
+                         "Tags": [tags], "Map": [webpage], "Mapper": [mapper]})
 
 def GetTags(webpage):
     for i in driver.find_elements_by_class_name("beatmapset-info__header"):
