@@ -36,7 +36,7 @@ def Single(webpage):
     return pd.DataFrame({"Song": [song], "Genre": [genre], "Youtube": [GetYoutube(song)], 
                          "Tags": [tags], "Map": [webpage], "Mapper": [mapper]})
 
-def GetTags(webpage):
+def GetTags():
     for i in driver.find_elements_by_class_name("beatmapset-info__header"):
         if 'Tags' in i.text:
             parent = i.find_element_by_xpath("..")
