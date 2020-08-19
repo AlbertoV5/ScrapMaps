@@ -3,6 +3,9 @@
 """
 Get Maps from osu! website.
 Using selenium with chromedriver on script path.
+
+osu! loved
+
 """
 from selenium import webdriver
 from pathlib import Path

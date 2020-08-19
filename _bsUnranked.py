@@ -51,8 +51,8 @@ def GetScore(): # returns [num of likes, num of dislikes]
             pass
     return numbers 
 
-def GetYoutube(name):
-    driver.get("https://www.youtube.com/results?search_query=" + name)    
+def GetYoutube(song):
+    driver.get("https://www.youtube.com/results?search_query=" + song)    
     return driver.find_element_by_id("video-title").get_attribute("href")
     
 def GetDate():
