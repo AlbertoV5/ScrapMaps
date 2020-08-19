@@ -7,22 +7,18 @@ Using selenium, make sure to have chromedriver updated.
 
 """
 from selenium import webdriver
-import os
+from pathlib import Path
+import pandas as pd
+import time
 
 website = "https://bsaber.com/songs/top/?ranked=false&time=7-days"
-driver = webdriver.Chrome(os.getcwd() + "/chromedriver")
-tsvFile = "data/beatsaberUnranked.tsv"
+driver = webdriver.Chrome(Path.cwd() / "chromedriver")
+tsvFile = Path.cwd() / "data" / "beatsaberUnranked.tsv"
 
 def MainPage():
     driver.get(website)    
     links = [i.get_attribute("href") for i in driver.find_elements_by_xpath("//a[@title]") if "songs" in i.get_attribute("href")]
-    links = list(dict.fromkeys(links))
-    text = ""
-    for i in links:
-        text = text + i + "\n"
-    with open("links.txt", "w+") as file:
-        file.write(text)
-    return links
+    return list(dict.fromkeys(links))
         
 def Categories():
     div = driver.find_element_by_class_name("bsaber-categories")
@@ -54,11 +50,6 @@ def GetScore():
             pass
     return numbers
 
-def iFrame():
-    try:
-        return driver.find_element_by_tag_name("iframe").get_attribute("src")
-    except:
-        return "No youtube link"
     
 def GetYoutube(name):
     driver.get("https://www.youtube.com/results?search_query=" + name)    
@@ -78,8 +69,9 @@ def GetDate():
     return num
 
 def Page(page):
-    print(page)
     driver.get(page)
+    time.sleep(1)
+    
     song = driver.find_element_by_class_name("entry-title").text
     mapper = Mapper()
     categories = Categories()
@@ -88,7 +80,6 @@ def Page(page):
     stream = GetYoutube(song)
     
     Row(song, mapper, categories, scores, stream, days, page)
-    
     
 def Row(song, mapper, categories, scores, stream, days, page):
     #ratio = str(int(scores[0]-scores[1]/days))
@@ -104,13 +95,12 @@ def Row(song, mapper, categories, scores, stream, days, page):
 
 
 # Create/rewrites the file
-header = "Song \t Genre \t Stream \t Tags \t Likes/Days \t Map \t Mapper \n"
+header = "Song \t Genre \t Youtube \t Tags \t Likes/Days \t Map \t Mapper \n"
 with open(tsvFile, "w+") as file:
     file.write(header)
 
 # Save 
-links = MainPage()
-for i in links:
+for i in MainPage():
     Page(i)
     
 print("\nDone :)")
