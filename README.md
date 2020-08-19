@@ -9,6 +9,6 @@ Scripts to go to:
 
 They get the map info of maps in first page. Around 15 for osu!, around 20 for BeastSaber. Also they go to youtube and look for the first result of the song title + artist name.
 
-Output goes to data/ as a .tsv, different names but same column structure. The idea is to add them manually to a google sheet to organize the data.
+Output goes to data folder as a tsv. The idea is to add the results manually to a google sheet to organize and review the data.
 
 Using Selenium, chromedriver.
